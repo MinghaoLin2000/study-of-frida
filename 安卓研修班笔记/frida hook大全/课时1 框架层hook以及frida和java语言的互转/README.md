@@ -11,4 +11,8 @@ ___
 https://bbs.pediy.com/thread-259186.htm
 
 0x02 java知识理解
-多线程的东西，frida之前也是讲过可以，在frida中直接实现这个接口，确实和老师讲的一样，frida和java非常类似，
+1. 多线程的东西，frida之前也是讲过可以，在frida中直接实现这个接口，确实和老师讲的一样，frida和java非常类似，同时这个异步线程中，也是运行在jvm中。
+2. java的基础我还是算蛮扎实的，毕竟以前就是java开发2333，所以这段，我就蛮听听了，然后就是使用了objection中的wallbreaker这个插件，把类的信息都打印出来，
+操作流程: 
+1. 先将frida-server开启，然后如果是用usb连接，直接在命令行中输入objection -g 包名 explore -P plugin的路径(-P后面可有可无，后期可以使用plugin load 插件路径加载插件，效果一样),
+2. 然后进入objection的界面后，加载wallbreaker的插件，就用上文的命令，加载之后，如果在打印类信息在objection界面的命令行中，输入plugin wallbreaker classdump -fullname 类的包名(xxx.xxx.xxx)
