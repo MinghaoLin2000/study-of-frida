@@ -16,3 +16,7 @@ https://bbs.pediy.com/thread-259186.htm
 操作流程: 
 1. 先将frida-server开启，然后如果是用usb连接，直接在命令行中输入objection -g 包名 explore -P plugin的路径(-P后面可有可无，后期可以使用plugin load 插件路径加载插件，效果一样),
 2. 然后进入objection的界面后，加载wallbreaker的插件，就用上文的命令，加载之后，如果在打印类信息在objection界面的命令行中，输入plugin wallbreaker classdump -fullname 类的包名(xxx.xxx.xxx)
+就可以打印出类的各种参数以及类的类型等，是真的强
+
+0x03 objection源码解析
+都是把frida hook给封装，然后hook对应的类，然后把类的hook信息都打印出来，frida nb，
