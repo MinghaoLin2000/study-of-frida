@@ -38,3 +38,4 @@ Java.perform(function(){
     }
 })
 ```
+接下来是讲解如何去hook，按钮点击时间的onClick方法的hook，这样可以打印出对应的类名，
