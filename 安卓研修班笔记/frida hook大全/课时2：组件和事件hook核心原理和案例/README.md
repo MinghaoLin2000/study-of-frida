@@ -38,4 +38,51 @@ Java.perform(function(){
     }
 })
 ```
-接下来是讲解如何去hook，按钮点击时间的onClick方法的hook，这样可以打印出对应的类名，
+接下来是讲解如何去hook，按钮点击时间的onClick方法的hook，这样可以打印出对应的类名，肉丝说一般的开发都不可能是使用直接实现ViewOnClick这个接口，创建匿名类的手法，这样很乱，我直接踩雷，好像平时也都是这样去写，可能是控件还不够多2333.
+这里挂一下hook 打印出onClick方法的类的类名
+```
+function watch(obj,mtdName)
+{
+    var listener_name=getObjClassName(obj);
+    var target=Java.use(listener_name);
+    if(!target||!mtdName in target)
+    {
+        return;
+    }
+    target[mtdName].overloads.forEach(function(overload){
+        overload.implementation=function(){
+            console.log("[WatchEvent]"+mtdName+":"+getObjClassName(this));
+            return this[mtdName].apply(this.argument);
+        }
+
+    })
+}
+function OnClickListener()
+{
+    Java.perform(function(){
+        #以spawn的模式自启动的hook
+        Java.use("android.view.View").setOnClickListener.implementation=function(listener){
+            if(listener!=null)
+            {
+                watch(listener,"onClick);
+            }
+            return this.setOnClickListener(listener);
+        };
+         #attach模式去附加进程的hook，就是更慢的hook，需要看hook的时机，hook一些已有的东西
+        Java.choose("android.view.ViewListenerInfo",{
+            onMatch:function(instance){
+                instance=instance.mOnClickListener.value;
+                if(instance)
+                {
+                    console.log("instance name is"+getObjClassName(instance));
+                    watch(instance,"onClick);
+                }
+            },
+            onComplete:function(){
+
+            }
+        })
+
+    })
+}
+watch这个函数，相等于是将实现点击接口类的所有onClick方法重载都hook了，只要调用这个方法就会打印出该类的名字
