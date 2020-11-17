@@ -15,4 +15,31 @@ pip install objection==xxx(版本号)
 1. pyenv versions 查看管理的所有python的版本
 2. pyenv local xxx(python的版本) 切换python版本
 切换完后面再pip！
+# 0x02 Objection的使用
+从objection --help里面扒出来的
+```
+Options:
+  -N, --network            Connect using a network connection instead of USB.
+                           [default: False]
+
+  -h, --host TEXT          [default: 127.0.0.1]
+  -p, --port INTEGER       [default: 27042]
+  -ah, --api-host TEXT     [default: 127.0.0.1]
+  -ap, --api-port INTEGER  [default: 8888]
+  -g, --gadget TEXT        Name of the Frida Gadget/Process to connect to.
+                           [default: Gadget]
+
+  -S, --serial TEXT        A device serial to connect to.
+  -d, --debug              Enable debug mode with verbose output. (Includes
+                           agent source map in stack traces)
+
+  --help                   Show this message and exit.
+```
+objecton可以选择两种连接方式，一种usb连接，一种是无线连接
+1. usb连接: objection -g 包名 explore
+2. 无线连接: objection -N -h xx(ip地址) -p xx(frida运行的非标准端口号) -g 包名 explore
+frida运行非标准端口:./frida_server -l 0.0.0.0:xxx(非标准端口号)
+
+
+
 
