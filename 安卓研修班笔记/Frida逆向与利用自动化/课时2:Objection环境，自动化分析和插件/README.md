@@ -81,7 +81,22 @@ android hooking watch class 包名.类名
 
 九.hook 方法的重载
 以hook 构造方法为例
-android hooking watch class_method 包名.类名.$init --dump-args
+android hooking watch class_method 包名.类名.$init --dump-args  
+
+# 0x03 objection插件们(wallbreaker,dexdump)  
+在objeciton中，输入plugin load 插件所在目录  
+然后加载插件后，就可以开始愉快使用了
+1. wallbreaker  
+打印出类的信息（方法与字段）
+plugin wallbreak classdump -fullname 包名.类名
+2. dexdump
+先进入对应包名，然后加载之后  
+plugin dexdump search
+开始查找内存中的dex文件  
+plugin dexdump dump
+把内存中的dex文件dump下来，之后有很多dex，先去找mainActivity  
+在kali命令行中找到存放dex文件的目录下，输入命令　grep ril "MainActivity" *
+如果还有有几个，那就多搜索不同的activity，就用objection中搜索activity，查看后，再次搜索，缩小范围
 
 
 
