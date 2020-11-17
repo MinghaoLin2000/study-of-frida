@@ -64,7 +64,24 @@ memory list exports xxx.so
 android hooking list activities  
 然后再启动我们想要启动的活动
 
+内存漫游  
+其实frida hook本质操作对象是类，所以我们的hook入手点就是找到要hook的类
+然后再找到我们要hook的方法，以及方法的参数与返回值，objection也帮我们搞好了  
 
+七.查找类以及类中方法  
+android hooking list class  
+方法  
+android hooking list class_method 类名  
+八.使用objection去hook类中的所有方法  
+android hooking watch class 包名.类名  
+
+使用jobs list可以查看hook数以及hook了哪个类  
+如果对特定的方法进行hook，并打印出参数和返回值调用栈    
+* android hooking watch class_method android.bluetooth.BluetoothDevice.getName --dump-args --dump-return --dump-backtrace  
+
+九.hook 方法的重载
+以hook 构造方法为例
+android hooking watch class_method 包名.类名.$init --dump-args
 
 
 
