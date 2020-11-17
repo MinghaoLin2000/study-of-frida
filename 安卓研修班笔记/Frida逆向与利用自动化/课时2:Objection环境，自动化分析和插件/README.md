@@ -16,7 +16,8 @@ pip install objection==xxx(版本号)
 2. pyenv local xxx(python的版本) 切换python版本
 切换完后面再pip！
 # 0x02 Objection的使用
-从objection --help里面扒出来的
+
+一. 从objection --help里面扒出来的
 ```
 Options:
   -N, --network            Connect using a network connection instead of USB.
@@ -39,6 +40,18 @@ Options:
 1. usb连接: objection -g 包名 explore
 2. 无线连接: objection -N -h xx(ip地址) -p xx(frida运行的非标准端口号) -g 包名 explore
 frida运行非标准端口:./frida_server -l 0.0.0.0:xxx(非标准端口号)
+
+* 以下操作(都在objection中进行）  
+二. 搜加载的so库文件
+memory list modules
+三. 查看库的导出函数
+memory list exports xxx.so
+* 有时候数据很难找时，可以去查看objection的日志进行查找.  
+在kali中的命令行执行cat .objection/objection.log | grep i xxx(要查找内容的关键字)
+四. 在内存堆中搜索与执行
+android heap search instances xxx.xxx.xxx.类名 
+
+
 
 
 
