@@ -47,14 +47,22 @@ memory list modules
 三. 查看库的导出函数
 memory list exports xxx.so
 * 有时候数据很难找时，可以去查看objection的日志进行查找.  
-在kali中的命令行执行cat .objection/objection.log | grep i xxx(要查找内容的关键字)
+在kali中的命令行执行cat .objection/objection.log | grep i xxx(要查找内容的关键字)  
+
 四. 在内存堆中搜索与执行
 查看堆中的对象:android heap search instances xxx.xxx.xxx.类名  
-调用方法: android heap execute 堆地址 方法名
+调用方法: android heap execute 堆地址 方法名  
+
 五.在实例上执行js代码
 先输入android heap evaluate 堆地址，会弹出一个窗口，输入js代码  
 如console.log("evaluate result"+clazz.getPreferenceScreenResId())
-输入完后，按esc，回车自动执行该js代码
+输入完后，按esc，回车自动执行该js代码  
+
+六.启动activity或者service
+　android intent lauch_activity 包名.活动名
+做法是先查找activity有哪些
+android hooking list activities  
+然后再启动我们想要启动的活动
 
 
 
