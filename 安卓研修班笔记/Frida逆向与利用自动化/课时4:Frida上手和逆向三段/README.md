@@ -224,7 +224,6 @@ function main()
 }
 setImmediate(main)
 ```
-
 # 4. 这里额外插一个调用栈的代码
 ```
 function main()
@@ -237,6 +236,122 @@ function main()
             console.log("arg1,arg2,result",arg1,arg2,result);
             return 800;
         }
+    })
+}
+setImmediate(main)
+```
+上面的不知道为啥感觉不够稳，老报错，慎重，还是objection香
+# 5. 方法的主动调用
+1. 实例方法的主动调用  
+调用app中的secret()方法，思想就是先去搜索对象实例，然后再调用实例方法  
+```
+{
+    Java.perform(function(){
+        /*
+        Java.use("com.example.lesson4one.MainActivity").fun.overload('int', 'int').implementation=function(arg1,arg2)
+        {
+            var result=this.fun(arg1,arg2);
+            //console.log(Java.use('android.util.log').getStackTraceString(Java.use("java.lang.Throwable").$new()));
+            console.log("arg1,arg2,result",arg1,arg2,result);
+            return 800;
+        }
+        Java.use("com.example.lesson4one.MainActivity").fun.overload('java.lang.String').implementation=function(arg1)
+        {
+                var result=this.fun(Java.use("java.lang.String").$new("NIHAOJAVA"));
+                console.log("arg1 result",arg1,result);
+                return result;
+        }
+        */
+        Java.choose("com.example.lesson4one.MainActivity",{
+            onMatch:function(instance){
+                console.log("found instance :",instance);
+                console.log("found instance:",instance.secret());
+            },onComplete:function(){}
+        })
+    })
+}
+setImmediate(main)
+```
+
+2. 静态方法的调用  
+在app中创建一个静态方法  
+```
+package com.example.lesson4one;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+import android.util.Log;
+
+public class MainActivity extends AppCompatActivity {
+    private static String total="";
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        while(true)
+        {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            int m=fun(50,80);
+            Log.d("YenKoc m =", String.valueOf(m));
+            Log.d("YenKoc tolowercase", fun("LOWERCASEME"));
+        }
+    }
+    String fun(String x)
+    {
+        total+=x;
+        return x.toLowerCase();
+    }
+    int fun(int x,int y)
+    {
+        Log.d("YenKoc",String.valueOf(x+y));
+       return x+y;
+    }
+    String secret()
+    {
+        return total;
+    }
+    public static String secret2()
+    {
+        return total;
+    }
+
+
+}
+```
+在js代码中也进行了修改  
+```
+function main()
+{
+    Java.perform(function(){
+        /*
+        Java.use("com.example.lesson4one.MainActivity").fun.overload('int', 'int').implementation=function(arg1,arg2)
+        {
+            var result=this.fun(arg1,arg2);
+            //console.log(Java.use('android.util.log').getStackTraceString(Java.use("java.lang.Throwable").$new()));
+            console.log("arg1,arg2,result",arg1,arg2,result);
+            return 800;
+        }
+        Java.use("com.example.lesson4one.MainActivity").fun.overload('java.lang.String').implementation=function(arg1)
+        {
+                var result=this.fun(Java.use("java.lang.String").$new("NIHAOJAVA"));
+                console.log("arg1 result",arg1,result);
+                return result;
+        }
+        
+        Java.choose("com.example.lesson4one.MainActivity",{
+            onMatch:function(instance){
+                console.log("found instance :",instance);
+                console.log("found instance:",instance.secret());
+            },onComplete:function(){}
+        })
+        */
+       var result=Java.use("com.example.lesson4one.MainActivity").secret2();
+       console.log("result:",result);
     })
 }
 setImmediate(main)
