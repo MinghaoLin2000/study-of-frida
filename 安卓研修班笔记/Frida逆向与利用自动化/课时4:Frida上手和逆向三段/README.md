@@ -356,3 +356,29 @@ function main()
 }
 setImmediate(main)
 ```
+# 6.通过上一节课的案例，加深frida的使用
+这里思路很巧妙，有时候无法从自动就开始hook到方法，可以先进行hook，然后通过回掉函数主动调用hook的方法，自产自销，秒，不过注意的一点就是回调函数的可以由进入frida后命令行直接进行调用，也可以使用setTimeout(函数名，时间)，延迟调用  
+```
+function main()
+{
+    Java.perform(function(){
+        Java.use("net.sqlcipher.database").getWritableDatabase.overload("java.lang.String").implementation=function(arg1){
+            var result=this.getWritableDatabase(arg1);
+            console.log("arg1:",arg1);
+            return result;
+        }
+    })
+}
+setImmediate(main)
+function voke()
+{
+    Java.perform(function(){
+        Java.choose("com.example.yaphetshan.tencentwelcome.MainActivity",{
+            onMatch:function(instance){
+                console.log("found instance",instance);
+                console.log("invoke instance.a",instance,a());
+            },onComplete:function(){console.log("search completed!")}
+        })
+    })
+}
+```
