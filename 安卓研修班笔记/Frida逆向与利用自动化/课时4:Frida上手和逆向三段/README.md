@@ -5,6 +5,8 @@
 4. 逆向三段: (hook invoke) rpc
 
 # 0x01 在kali上安装androidstudio，然后新建一个app项目，开始测试frida
+# 1. 小试牛刀  
+
 app中的主代码
 ```
 m.example.lesson4one;
@@ -55,4 +57,118 @@ setImmediate(main)
 ```
 在vscode中打开终端(Terminal在界面的左上)，先进入（cd）js所在目录后，然后输入命令:  
 frida -U 包名 -l xxx.js  
-发现参数和返回值都打印出来了
+发现参数和返回值都打印出来了  
+# 2. 改变参数和返回值，修改一个app代码
+```
+package com.example.lesson4one;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+import android.util.Log;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        while(true)
+        {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            int m=fun(50,80);
+            Log.d("kanxue m =", String.valueOf(m));
+        }
+    }
+    int fun(int x,int y)
+    {
+        Log.d("YenKoc",String.valueOf(x+y));
+       return x+y;
+    }
+
+}
+```
+把js代码也修改一下
+```
+function main()
+{
+    Java.perform(function(){
+        Java.use("com.example.lesson4one.MainActivity").fun.implementation=function(arg1,arg2)
+        {
+            var result=this.fun(arg1,arg2);
+            console.log("arg1,arg2,result",arg1,arg2,result);
+            return 800;
+        }
+    })
+}
+setImmediate(main)
+```
+同样执行后，发现log中的返回值发生了改变了，说明hook成功了
+
+# 3. 方法的重载处理
+修改一下app代码，增加一个重载方法以及一个未被调用的方法
+```
+package com.example.lesson4one;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+import android.util.Log;
+
+public class MainActivity extends AppCompatActivity {
+    private String total="";
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        while(true)
+        {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            int m=fun(50,80);
+            Log.d("YenKoc m =", String.valueOf(m));
+            Log.d("YenKoc tolowercase", fun("LOWERCASEME!"));
+        }
+    }
+    String fun(String x)
+    {
+        total+=x;
+        return x.toLowerCase();
+    }
+    int fun(int x,int y)
+    {
+        Log.d("YenKoc",String.valueOf(x+y));
+       return x+y;
+    }
+    String secret()
+    {
+        return total;
+    }
+
+
+}
+```
+这里再运行之前的js代码肯定会报错，因为有方法的重载，这里需要重新处理
+# 4. 这里额外插一个调用栈的代码
+```
+function main()
+{
+    Java.perform(function(){
+        Java.use("com.example.lesson4one.MainActivity").fun.implementation=function(arg1,arg2)
+        {
+            var result=this.fun(arg1,arg2);
+            console.log(Java.use('android.util.log').getStackTraceString(Java.use("java.lang.Throwable").$new()));
+            console.log("arg1,arg2,result",arg1,arg2,result);
+            return 800;
+        }
+    })
+}
+setImmediate(main)
+```
