@@ -53,3 +53,6 @@ function main()
 }
 setImmediate(main)
 ```
+在vscode中打开终端(Terminal在界面的左上)，先进入（cd）js所在目录后，然后输入命令:  
+frida -U 包名 -l xxx.js  
+发现参数和返回值都打印出来了
