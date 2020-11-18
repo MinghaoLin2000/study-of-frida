@@ -155,7 +155,76 @@ public class MainActivity extends AppCompatActivity {
 
 }
 ```
-这里再运行之前的js代码肯定会报错，因为有方法的重载，这里需要重新处理
+这里再运行之前的js代码肯定会报错，因为有方法的重载，这里需要重新处理,重新修改后的js代码  
+```
+function main()
+{
+    Java.perform(function(){
+        Java.use("com.example.lesson4one.MainActivity").fun.overload('int', 'int').implementation=function(arg1,arg2)
+        {
+            var result=this.fun(arg1,arg2);
+            //console.log(Java.use('android.util.log').getStackTraceString(Java.use("java.lang.Throwable").$new()));
+            console.log("arg1,arg2,result",arg1,arg2,result);
+            return 800;
+        }
+        Java.use("com.example.lesson4one.MainActivity").fun.overload('java.lang.String').implementation=function(arg1)
+        {
+                var result=this.fun(arg1);
+                console.log("arg1 result",arg1,result);
+                return result;
+        }
+    })
+}
+setImmediate(main)
+```
+overload都是从报错信息中复制粘贴的，真香  
+接下来修改参数或返回值:
+```
+function main()
+{
+    Java.perform(function(){
+        Java.use("com.example.lesson4one.MainActivity").fun.overload('int', 'int').implementation=function(arg1,arg2)
+        {
+            var result=this.fun(arg1,arg2);
+            //console.log(Java.use('android.util.log').getStackTraceString(Java.use("java.lang.Throwable").$new()));
+            console.log("arg1,arg2,result",arg1,arg2,result);
+            return 800;
+        }
+        Java.use("com.example.lesson4one.MainActivity").fun.overload('java.lang.String').implementation=function(arg1)
+        {
+                var result=this.fun("NIHAO");
+                console.log("arg1 result",arg1,result);
+                return result;
+        }
+    })
+}
+setImmediate(main)
+```
+这里又引出了一个frida启动spawn的方法，重新自启动
+frida -U -f 包名 -l xxxx.js执行后，再执行%resume，重新执行   
+这里的字符串不是java的字符串而是js的，虽然有自动转换，最好还是直接使用java的api生成字符串  
+```
+function main()
+{
+    Java.perform(function(){
+        Java.use("com.example.lesson4one.MainActivity").fun.overload('int', 'int').implementation=function(arg1,arg2)
+        {
+            var result=this.fun(arg1,arg2);
+            //console.log(Java.use('android.util.log').getStackTraceString(Java.use("java.lang.Throwable").$new()));
+            console.log("arg1,arg2,result",arg1,arg2,result);
+            return 800;
+        }
+        Java.use("com.example.lesson4one.MainActivity").fun.overload('java.lang.String').implementation=function(arg1)
+        {
+                var result=this.fun(Java.use("java.lang.String").$new("NIHAOJAVA"));
+                console.log("arg1 result",arg1,result);
+                return result;
+        }
+    })
+}
+setImmediate(main)
+```
+
 # 4. 这里额外插一个调用栈的代码
 ```
 function main()
