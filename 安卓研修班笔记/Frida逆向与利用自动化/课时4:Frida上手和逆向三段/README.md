@@ -37,4 +37,19 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 ```
-hook的js文件，这里和肉丝在github上有点区别，肉丝在github上发的文章上的话，是利用python来作为一个载体执行js，盲猜可能是后面rpc才会用到，这种js直接启动真的香
+hook的js文件，这里和肉丝在github上有点区别，肉丝在github上发的文章上的话，是利用python来作为一个载体执行js，盲猜可能是后面rpc才会用到，这种js直接启动真的香  
+这里编写js文件，我选择是在FRIDA-AGENT-EXAMPLE中的agent文件夹下编写，没有为什么，问就是有智能提示2333
+```
+function main()
+{
+    Java.perform(function(){
+        Java.use("com.example.lesson4one.MainActivity").fun.implementation=function(arg1,arg2)
+        {
+            var result=this.fun(arg1,arg2);
+            console.log("arg1,arg2,result",arg1,arg2,result);
+            return result;
+        }
+    })
+}
+setImmediate(main)
+```
