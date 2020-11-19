@@ -179,3 +179,31 @@ setImmediate(main);
 ```
 
 # 5。接口
+可以在frida中创建一个java类，实现java层中的接口，案例:  
+```
+    var beer=Java.registerClass({
+          name:"com.r0ysue.a0526printout.beer",
+          implements:[Java.use('com.r0ysue.a0526printout.liquid')],
+          methods:{
+              flow:function(){
+                  console.log("look I'm beer");
+                  return "taste good";
+              }
+          }
+      });
+      console.log("beer.flow",beer.$new().flow())
+    })
+```
+这里就是新建一个类实现了对应的接口
+
+# 6.枚举
+```
+Java.choose("com.r0ysue.a0526printout.Signal",{
+         onMatch:function(instance){
+             console.log("found instance:",instance)
+             console.log("invoke getDeclaringClass",instance.getDeclaringClass());
+         },onComplete:function(){console.log("Search Completed!")}
+     })
+    })
+```
+枚举可以直接看成是一个类，那么这样对frida来说就是小菜一碟了
