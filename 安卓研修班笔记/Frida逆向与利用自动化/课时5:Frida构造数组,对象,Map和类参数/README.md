@@ -7,7 +7,7 @@
 6. non-ascii 方法名 hook
 
 # 0x01 
-app代码:  
+# 1.app代码:  
 ```
  Log.d("SimpleArray", "onCreate: SImpleArray");
         char arr[][] = new char[4][]; // 创建一个4行的二维数组
@@ -44,3 +44,26 @@ function main()
 }
 setImmediate(main);
 ```
+# 2.对象数组
+这里引出一个参数为char类型的数组，hook一下  
+```
+function main()
+{
+    Java.perform(function(){
+        Java.use("java.lang.Character").toString.overload('char').implementation=function(arg1)
+        {
+            var result=this.toString(arg1);
+            console.log("x,result",arg1,result);
+            return result;
+        }
+        Java.use("java.util.Arrays").toString.overload('[C').implementation=function(x)
+        {
+            var result=this.toString(x);
+            console.log("x,result",x,result);
+            return result;
+        }
+    })
+}
+setImmediate(main);
+```
+这里发现hook出来的参数发现无法打印出来，两个都是Object类型，需要有特殊的操作
