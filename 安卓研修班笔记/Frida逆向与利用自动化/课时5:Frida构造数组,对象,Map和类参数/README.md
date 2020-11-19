@@ -207,3 +207,23 @@ Java.choose("com.r0ysue.a0526printout.Signal",{
     })
 ```
 枚举可以直接看成是一个类，那么这样对frida来说就是小菜一碟了
+
+# 7.泛型，List,Map,Set,迭代打印
+1. Map
+```
+function hashmap888()
+{
+    Java.perform(function(){
+        Java.choose("java.util.HashMap",{
+            onMatch:function(instance){
+                if(instance.toString().indexOf("Sim"))
+                {
+                    console.log("found instance",instance);
+                    console.log("HashmapString",instance.toString());
+                }
+                
+            },onComplete:function(){console.log("search Completed!")}
+        })
+    })
+}
+```
