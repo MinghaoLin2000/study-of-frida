@@ -76,3 +76,106 @@ Java.use("java.util.Arrays").toString.overload('[C').implementation=function(x)
             return result;
         }
 ```
+2. 肉丝表哥自己编译的一个gson包来处理  
+先将下载好的dex文件放入/data/local/tmp目录下，然后frida动态加载dex，调用其中方法
+```
+function main()
+{
+    Java.perform(function(){
+        /*Java.use("java.lang.Character").toString.overload('char').implementation=function(arg1)
+        {
+            var result=this.toString(arg1);
+            console.log("x,result",arg1,result);
+            return result;
+        }*/
+        Java.openClassFile("/data/local/tmp/r0gson.dex").load();
+        const gson=Java.use("com.r0ysue.gson.Gson");
+        Java.use("java.util.Arrays").toString.overload('[C').implementation=function(x)
+        {
+            var result=this.toString(x);
+            console.log("x,result",gson.$new().toJson(x),result);
+            return result;
+        }
+    })
+}
+setImmediate(main);
+```
+# 3.自己构造一个char数组对象(Java.array)
+```
+function main()
+{
+    Java.perform(function(){
+        /*Java.use("java.lang.Character").toString.overload('char').implementation=function(arg1)
+        {
+            var result=this.toString(arg1);
+            console.log("x,result",arg1,result);
+            return result;
+        }*/
+        Java.openClassFile("/data/local/tmp/r0gson.dex").load();
+        const gson=Java.use("com.r0ysue.gson.Gson");
+        Java.use("java.util.Arrays").toString.overload('[C').implementation=function(x)
+        {
+            var charArray=Java.array('char',['1','2','3','4','5']);
+            var result=this.toString(charArray);
+            console.log("x,result",gson.$new().toJson(x),result);
+            return result;
+        }
+    })
+}
+setImmediate(main);
+```
+
+# 4.对象类型强制转换Java.cast
+总体来说就是父类是无法强转成子类的，子类可以向上强转成父类的，然后就是查找对象时，有时候时机过早或过晚，会导致找不到实例，所以选择的话，选择延时hook，setTimeout(function,3000),然后用spawn方式启动app  
+
+```
+function main()
+{
+    Java.perform(function(){
+        /*Java.use("java.lang.Character").toString.overload('char').implementation=function(arg1)
+        {
+            var result=this.toString(arg1);
+            console.log("x,result",arg1,result);
+            return result;
+        }*/
+        
+        Java.openClassFile("/data/local/tmp/r0gson.dex").load();
+        const gson=Java.use("com.r0ysue.gson.Gson");
+        /*
+        Java.use("java.util.Arrays").toString.overload('[C').implementation=function(x)
+        {
+            var charArray=Java.array('char',['1','2','3','4','5']);
+            var result=this.toString(charArray);
+            console.log("x,result",gson.$new().toJson(x),result);
+            return result;
+        }
+        */
+       var waterhandle=null;
+       Java.choose("com.r0ysue.a0526printout.Water",{
+           onMatch:function(instance){
+               console.log("found instance:",instance);
+               console.log("water call still:",instance.still(instance));
+               waterhandle=instance;
+           },onComplete:function(){
+            console.log("search completed")
+           }
+       })
+       var JuiceHandle=Java.cast(waterhandle,Java.use("com.r0ysue.a0526printout.Juice"));
+       console.log("Juice fillEnergy method:",JuiceHandle.fillEnergy());
+
+       var JuiceHandle=null;
+       Java.choose("com.r0ysue.a0526printout.Juice",{
+           onMatch:function(instance){
+               console.log("found instance:",instance);
+               console.log("filling energy,",instance.fillEnergy());
+               JuiceHandle=instance;
+           },onComplete:function(){"Search Completed"}
+       })
+       var waterhandle=Java.cast(JuiceHandle,Java.use("com.r0ysue.a0526printout.Water"));
+       console.log("Water invoke kill");
+    })
+}
+setImmediate(main);
+```
+
+# 5。接口
