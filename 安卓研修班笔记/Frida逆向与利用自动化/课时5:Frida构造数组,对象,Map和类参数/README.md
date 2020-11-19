@@ -66,4 +66,13 @@ function main()
 }
 setImmediate(main);
 ```
-这里发现hook出来的参数发现无法打印出来，两个都是Object类型，需要有特殊的操作
+这里发现hook出来的参数发现无法打印出来，两个都是Object类型，需要有特殊的操作  
+1. 使用Json.stringify(x)方法可以打印出Object
+```
+Java.use("java.util.Arrays").toString.overload('[C').implementation=function(x)
+        {
+            var result=this.toString(x);
+            console.log("x,result",JSON.stringify(x),result);
+            return result;
+        }
+```
