@@ -29,7 +29,7 @@ app代码:
             }
         }
 ```
-这里直接hook java.lang.Arrays的toString方法，打印出参数和返回值
+这里直接hook java.lang.Character的toString方法，打印出参数和返回值
 ```
 function main()
 {
