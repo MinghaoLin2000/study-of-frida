@@ -65,3 +65,4 @@ while True:
 device=frida.get_device_manager().add_remote_device("ip:port")
 其实就是用无线来连接，实现混连
 # 0x03 frida互联互通和动态修改
+还剩27分钟，谁能想到我被更新gradle给阻击了，好卡，下的好慢呜呜
