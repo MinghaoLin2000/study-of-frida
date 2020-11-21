@@ -65,3 +65,63 @@ while True:
 device=frida.get_device_manager().add_remote_device("ip:port")
 其实就是用无线来连接，实现混连
 # 0x03 frida互联互通和动态修改
+先放个js代码
+```
+
+Java.perform(function()
+    {
+        Java.use("android.widget.TextView").setText.overload("java.lang.CharSequence").implementation=function(x){
+            var string_to_send_x=x.toString();
+            var string_to_recv;
+            //console.log("arg :x",x.toString());
+
+            send(string_to_send_x);
+            
+            recv(function(received_json_objection){
+                string_to_recv=received_json_objection.my_data
+                console.log("string_to_recv"+string_to_recv)
+            }).wait();
+            
+
+            var javaStringToSend=Java.use("java.lang.String").$new(string_to_recv);
+            var result=this.setText(javaStringToSend);
+            console.log("x.toString(),result",x.toString(),result);
+            return result;
+        
+        }
+    })
+```
+python的代码
+```
+import time
+import frida
+import base64
+
+def my_message_handler(message,payload):
+    print(message)
+    print(payload)
+    if message["type"]=="send":
+        print(message["payload"])
+        data=message["payload"].split(":")[1].strip()
+        print("message",message)
+        data=str(base64.b64decode(data))
+        print("data:",data)
+        usr,pw=data.split(":")
+        print("pw:",pw)
+        data=str(base64.b64encode(("admin"+":"+pw).encode()))
+        print("encode data:",data)
+        script.post({"my_data":data})
+        print("Modified data sent!")
+device=frida.get_usb_device()
+#device=frida.get_device_manager().add_remote_device("ip:port")
+#pid=device.spawn(["com.example.lesson4one"])
+#device.resume
+#time.sleep(1)
+#session=device.attach(pid)
+session=device.attach("com.example.lesson7sec")
+with open("lesson7sec.js") as f:
+    script=session.create_script(f.read())
+script.on("message",my_message_handler)
+script.load()
+input()
+```
