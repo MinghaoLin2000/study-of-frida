@@ -230,3 +230,33 @@ public class MessengerActivity extends c {
         return new String(charArray);
     }
 ```
+这里加密过程其实不难理解，进行对半交换，交换的过程中，后半部分异或1，前半部分异或'A'，
+直接写出来解密算法就好了，这里肉丝是编成了dex来frida动态加载进行执行，可能是为了方便之后的自动化。
+### 编写dex，并动态加载dex
+1. 这里androidstudio新建一个项目，然后新建一个类，将逆向的方法写在这个类中
+```
+package com.example.lesson9;
+
+public class reversed {
+    public static String decode_p()
+    {
+        String p = "V@]EAASB\u0012WZF\u0012e,a$7(&am2(3.\u0003";
+        String result=a(p);
+        return result;
+    }
+    private static String a(String str) {
+        char[] charArray = str.toCharArray();
+        for (int i = 0; i < charArray.length / 2; i++) {
+            char c = charArray[i];
+            charArray[i] = (char) (charArray[(charArray.length - i) - 1] ^ 'A');
+            charArray[(charArray.length - i) - 1] = (char) (c ^ '2');
+        }
+        return new String(charArray);
+    }
+}
+```
+2. 然后make project，由gradle来进行编译，生成了apk
+3. 然后我们进入到/root/AndroidStudioProjects/lesson9/app/build/intermediates/javac/debug/classes/com/example/lesson9目录下（这里可以右键androidstudio的包名目录，可以直接进入终端，虽然还是要调整，但是快了一些），然后使用/root/Android/Sdk/build-tools/29.0.3/d8，命令将逆向的class文件，打包成一个dex文件，push到android手机/data/local/tmp目录下
+4. 
+
+
