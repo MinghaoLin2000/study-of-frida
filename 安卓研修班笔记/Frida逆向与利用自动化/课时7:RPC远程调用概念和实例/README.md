@@ -65,9 +65,54 @@ while True:
 device=frida.get_device_manager().add_remote_device("ip:port")
 其实就是用无线来连接，实现混连
 # 0x03 frida互联互通和动态修改
-先放个js代码
+这里肉丝重新写了一个lesson7sec的app，主活动大概是这样的
 ```
+package com.example.lesson7sec;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+import android.util.Base64;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText username_et;
+    EditText password_et;
+    TextView message_tv;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        password_et = (EditText) this.findViewById(R.id.editText2);
+        username_et = (EditText) this.findViewById(R.id.editText);
+        message_tv = ((TextView) findViewById(R.id.textView));
+
+        this.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (username_et.getText().toString().compareTo("admin") == 0) {
+                    message_tv.setText("You cannot login as admin");
+                    return;
+                }
+                //hook target
+                message_tv.setText("Sending to the server :" + Base64.encodeToString((username_et.getText().toString() + ":" + password_et.getText().toString()).getBytes(), Base64.DEFAULT));
+
+            }
+        });
+
+    }
+}
+```
+发现就是一个很平常的登陆界面，一个用户名一个密码，不过这里有个限制，输入账号和密钥后，直接点击登陆后，先判断用户名是否为admin，只有不是admin用户才能使用这个登陆框登陆，不过这题的意思就是为了打破这个限制，使得用户名可以输入admin，进行登陆，主要的操作逻辑在于hook这个setText方法，先把参数取出来，然后发送消息，给本地的python的代码进行处理，处理完后，再响应回去，再调用原方法，偷梁换柱 ，至于写法都是固定的，直接搬过来，改动一下就好了
+
+先放个js代码，这里和rpc不同的是，不需要function作为外壳了，直接以Java.perform作为一个主体
+```
 Java.perform(function()
     {
         Java.use("android.widget.TextView").setText.overload("java.lang.CharSequence").implementation=function(x){
@@ -91,7 +136,7 @@ Java.perform(function()
         }
     })
 ```
-python的代码
+python的代码,处理的主要过程在python这里
 ```
 import time
 import frida
