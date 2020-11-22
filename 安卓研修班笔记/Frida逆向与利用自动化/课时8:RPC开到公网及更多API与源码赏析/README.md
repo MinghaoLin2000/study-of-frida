@@ -27,3 +27,6 @@ ___
 
 我这里又报错了，发现remote不到frida-server，有点迷，还得问问
 # 0x02 ZenTrace
+哭了，又报错说python版本和frida版本对不上。自闭
+ZenTrace的源码分析，这里我没办法操作，就只能看了
+# 0x03 Frida-DEXDump源码分析
