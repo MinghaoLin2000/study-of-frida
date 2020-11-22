@@ -15,3 +15,15 @@ https://www.cnblogs.com/jimaojin/p/12381656.html
 https://ehang-io.github.io/nps/#/nps_use  
 ___
 下一步开始配置我的客户端
+1. 首先安装客户端的nps，下载好tar文件，然后解密
+2. 之后去服务端打开nps后台，新建一个客户端，名字备注一下，其他都不用填
+3. 然后新建一个tcp隧道，服务端端口随意，客户端端口填frida-server运行的非标准端口
+4. 然后点击nps后台的客户端，发现我们之前创建的客户端存在了，然后点击左边的加号，出现一个客户端命令，类似./npc -server=xxx.xxx.xxx:8024 -vkey=XXX -type=tcp
+5. 把这行命令复制下来，粘贴到手机上对应之前解压那个客户端nps的目录下，直接运行
+6. 如果一切顺利，发现web端nps的客户端会显示已经连接，说明一切正常
+7. 最后别忘记启动frida-server在你之前新建隧道时填写的端口号
+8. 在python代码中的remote_devices方法，里面就不用和之前一样填写手机的ip和端口了,
+可以直接填写服务端的ip和tcp隧道上我们填写的服务端端口，因为已经内网穿透了
+
+我这里又报错了，发现remote不到frida-server，有点迷，还得问问
+# 0x02 ZenTrace
