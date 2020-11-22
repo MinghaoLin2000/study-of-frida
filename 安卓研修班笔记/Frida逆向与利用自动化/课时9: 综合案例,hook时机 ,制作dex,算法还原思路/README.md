@@ -425,6 +425,6 @@ if (s.check() == sat):
     print(len(flag), len(r_result))
 
 ```
-
-
+  
+附上个学习z3的链接：https://blog.csdn.net/s1054436218/article/details/78651075
 
