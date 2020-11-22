@@ -257,6 +257,174 @@ public class reversed {
 ```
 2. 然后make project，由gradle来进行编译，生成了apk
 3. 然后我们进入到/root/AndroidStudioProjects/lesson9/app/build/intermediates/javac/debug/classes/com/example/lesson9目录下（这里可以右键androidstudio的包名目录，可以直接进入终端，虽然还是要调整，但是快了一些），然后使用/root/Android/Sdk/build-tools/29.0.3/d8，命令将逆向的class文件，打包成一个dex文件，push到android手机/data/local/tmp目录下
-4. 
+4. 然后chmod 777 那个dex文件，然后再启动frida-server
+5. 目前的js代码：
+```
+function main()
+{
+    Java.perform(function(){
+        Java.openClassFile("/data/local/tmp/classes.dex").load();
+        var reversed=Java.use("com.example.lesson9.reversed");
+        console.log("reversed result:",reversed.decode_p());
+        Java.use("java.lang.System").getProperty.overload('java.lang.String').implementation=function(x)
+        {
+            var result=this.getProperty(x);
+            console.log("x,result:",x,result);
+            return Java.use("java.lang.String").$new("Russia");
+        }
+        Java.use("java.lang.System").getenv.overload("java.lang.String").implementation=function(x)
+        {
+            var result=this.getenv(x);
+            console.log("x,result:",x,result);
+            return Java.use("java.lang.String").$new("RkxBR3s1N0VSTDFOR180UkNIM1J9Cg==");
+        }
+        /*
+        Java.use("com.tlamb96.kgbmessenger.b.a").$init.implementation=function(str0,str1,str2,b)
+        {
+            var result=this.$init(str0,str1,str2,b);
+            console.log(Java.use("android.util.Log").getStackTraceString(Java.use("java.lang.Throwable").$new()));
+
+
+            console.log("str0,str1,str2,b:",str0,str1,str2,b);
+            return result;
+        }
+        */
+       /*
+        Java.use("com.tlamb96.kgbmessenger.MessengerActivity").a.implementation=function(x)
+        {
+            var result=this.a(x);
+            console.log("x,result",x,result);
+            return Java.use("java.lang.String").$new("V@]EAASB\u0012WZF\u0012e,a$7(&am2(3.\u0003");
+        }
+        Java.use("com.tlamb96.kgbmessenger.MessengerActivity").b.implementation=function(x)
+        {
+            var result=this.b(x);
+            console.log("x,result",x,result);
+            return Java.use("java.lang.String").$new("\u0000dslp}oQ\u0000 dks$|M\u0000h +AYQg\u0000P*!M$gQ\u0000")
+        }
+        */
+
+    })
+}
+setImmediate(main)
+```
+6. 剩下一个字符串有unicode的编码，先进行一波转换，重新编写app的代码，然后再编译
+```
+package com.example.lesson9;
+
+public class reversed {
+    public static String decode_p()
+    {
+        String p = "V@]EAASB\u0012WZF\u0012e,a$7(&am2(3.\u0003";
+        String result=a(p);
+        return result;
+    }
+    private static String a(String str) {
+        char[] charArray = str.toCharArray();
+        for (int i = 0; i < charArray.length / 2; i++) {
+            char c = charArray[i];
+            charArray[i] = (char) (charArray[(charArray.length - i) - 1] ^ 'A');
+            charArray[(charArray.length - i) - 1] = (char) (c ^ '2');
+        }
+        return new String(charArray);
+    }
+    public static String r_to_hex()
+    {
+        String r = "\u0000dslp}oQ\u0000 dks$|M\u0000h +AYQg\u0000P*!M$gQ\u0000";
+        byte[] bytes=r.getBytes();
+        String result="";
+        for(int i=0;i<bytes.length;i++)
+        {
+            result+=String.format("%02x",bytes[i]);
+        }
+        return result;
+
+    }
+}
+```
+和之前一样的步骤，先clean project，重新编译，可能之前目录会消失，重新进入一下就好了，和之前一样的步骤，将生成好的dex文件push到手机上，然后chmod 777 dex的文件，重新编写一下js的代码  
+```
+function main()
+{
+    Java.perform(function(){
+        Java.openClassFile("/data/local/tmp/classes.dex").load();
+        var reversed=Java.use("com.example.lesson9.reversed");
+        console.log("reversed result:",reversed.decode_p());
+        console.log("b.toString():",reversed.r_to_hex());
+        Java.use("java.lang.System").getProperty.overload('java.lang.String').implementation=function(x)
+        {
+            var result=this.getProperty(x);
+            console.log("x,result:",x,result);
+            return Java.use("java.lang.String").$new("Russia");
+        }
+        Java.use("java.lang.System").getenv.overload("java.lang.String").implementation=function(x)
+        {
+            var result=this.getenv(x);
+            console.log("x,result:",x,result);
+            return Java.use("java.lang.String").$new("RkxBR3s1N0VSTDFOR180UkNIM1J9Cg==");
+        }
+        /*
+        Java.use("com.tlamb96.kgbmessenger.b.a").$init.implementation=function(str0,str1,str2,b)
+        {
+            var result=this.$init(str0,str1,str2,b);
+            console.log(Java.use("android.util.Log").getStackTraceString(Java.use("java.lang.Throwable").$new()));
+
+
+            console.log("str0,str1,str2,b:",str0,str1,str2,b);
+            return result;
+        }
+        */
+       /*
+        Java.use("com.tlamb96.kgbmessenger.MessengerActivity").a.implementation=function(x)
+        {
+            var result=this.a(x);
+            console.log("x,result",x,result);
+            return Java.use("java.lang.String").$new("V@]EAASB\u0012WZF\u0012e,a$7(&am2(3.\u0003");
+        }
+        Java.use("com.tlamb96.kgbmessenger.MessengerActivity").b.implementation=function(x)
+        {
+            var result=this.b(x);
+            console.log("x,result",x,result);
+            return Java.use("java.lang.String").$new("\u0000dslp}oQ\u0000 dks$|M\u0000h +AYQg\u0000P*!M$gQ\u0000")
+        }
+        */
+
+    })
+}
+setImmediate(main)
+```
+## 7. z3的爆破使用
+z3的爆破其实我一般比较抗拒，但是相对于爆破来说是真的香，还是得多学习
+```
+from z3 import *
+from binascii import b2a_hex,a2b_hex
+a="0064736c707d6f510020646b73247c4d0068202b4159516700502a214d24675100"
+s=Solver()
+print(a2b_hex(a))
+r_result=bytearray(a2b_hex(a))
+for i in range(int(len(r_result))//2):
+    c=r_result[i]
+    r_result[i]=r_result[len(r_result)-i-1]
+    r_result[len(r_result)-i-1]=c
+print(b2a_hex(r_result))
+x = [BitVec("x%s" % i, 32) for i in range(len(r_result))]
+for i in range(len(r_result)):
+    c = r_result[i]
+    print(i,hex(c))
+    s.add(((x[i] >> (i % 8)) ^ x[i] ) == r_result[i])
+if (s.check() == sat):
+    model = s.model()
+    print(model)
+    flag=""
+    for i in range(len(r_result)):
+        if (model[x[i]] != None):
+            flag += chr(model[x[i]].as_long().real)
+        else:
+            flag += " "
+    print('"' + flag + '"')
+    print(len(flag), len(r_result))
+
+```
+
 
 
