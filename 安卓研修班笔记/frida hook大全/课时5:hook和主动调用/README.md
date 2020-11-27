@@ -65,4 +65,33 @@ setImmediate(main1);
 ```
 不知道为什么一hook参数就crash了，lj app（吐槽  
 3. 主动调用
+核心思想就是先在so中找到对应的地址，这是关键，没有地址一切都是扯淡，这里暂时还没用到偏移，都是通过objection的找到so的导出函数被符号修饰后的符号名，直接通过frida api得到的结果。至于手法就直接记住就好了
+```
+function hookandinvoke_add()
+{
+    var native_lib_addr=Module.findBaseAddress("libnative-lib.so");
+    console.log("native_lib_addr ->",native_lib_addr);
+    var r0add_addr=Module.findExportByName("libnative-lib.so","_Z5r0addii");
+    console.log("r0add addr ->",r0add_addr);
+    Interceptor.attach(r0add_addr,{
+        onEnter:function(args){
+            console.log("x->",args[0],"y->",args[1]);
 
+        },onLeave:function(retval)
+        {
+            console.log("retval is ->",retval);
+
+        }
+    })
+    var r0add=new NativeFunction(r0add_addr,"int",["int","int"]);
+    var r0add_result=r0add(50,2);
+    console.log("invoke result is",r0add_result);
+    
+}
+function main1()
+{
+    //hook_nativelib();
+    hookandinvoke_add();
+}
+setImmediate(main1);
+```
