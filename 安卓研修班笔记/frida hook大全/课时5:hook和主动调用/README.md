@@ -154,3 +154,40 @@ setImmediate(main1);
             console.log("CCCryptoCreate called from:\n"+Thread.backtrace(this.context,Backtracer.ACCURATE).map(DebugSymbol.fromAddress).join("\n")+'\n');
 ```
 这行代码加入到hook的代码中去，就可以打印出调用栈
+# 0x03 replace
+这玩意其实就相当于java层中的hook，上面那个主动调用的话，其实就是this.xx的形式
+```
+function hook_replace()
+{
+    var native_lib_addr=Module.findBaseAddress("libnative-lib.so");
+    console.log("native_lib_addr ->",native_lib_addr);
+    var myfirstjniJNI=Module.findExportByName("libnative-lib.so","Java_com_example_demoso1_MainActivity_myfirstjniJNI");
+    console.log("myfirstjiniJNI addr ->",myfirstjniJNI);
+    var myfirstjniJNI_invoke=new NativeFunction(myfirstjniJNI,"pointer",["pointer","pointer","pointer"]);
+    Interceptor.replace(myfirstjniJNI,new NativeCallback(function(args0,args1,args2){
+        console.log("Interceptor.attach myfirstjniJNI args:",args0,args1,args2);
+        
+        return Java.vm.getEnv().newStringUtf("new Retval from frida");
+
+    },"pointer",["pointer","pointer","pointer"]));
+   
+
+}
+```
+肉丝说不常用，但是我感觉改返回值啥的，还可以把
+# 0x04 枚举出所有模块的所有导出符号（静态注册的才行）
+```
+function EnumerateAllExports()
+{
+    var  modules=Process.enumerateModules();
+    //print all modules
+    //console.log("Process.enumerateModules->",JSON.stringify(modules));
+    for(var i=0;i<modules.length;i++)
+    {
+        var module=modules[i];
+        var module_name=modules[i].name;
+        var exports=module.enumerateExports();
+        console.log("module.enumerateeExports",JSON.stringify(exports))
+    }
+}
+```
