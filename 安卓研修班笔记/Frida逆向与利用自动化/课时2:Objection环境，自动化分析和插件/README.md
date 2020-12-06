@@ -42,7 +42,7 @@ Options:
 frida运行非标准端口:./frida_server -l 0.0.0.0:xxx(非标准端口号)
 
 * 以下操作(都在objection中进行）  
-二. 搜加载的so库文件
+二. 搜加载的so库文件 
 memory list modules
 三. 查看库的导出函数
 memory list exports xxx.so
