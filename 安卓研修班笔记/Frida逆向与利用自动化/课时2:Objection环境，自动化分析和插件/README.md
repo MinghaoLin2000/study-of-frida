@@ -95,7 +95,7 @@ plugin dexdump search
 开始查找内存中的dex文件  
 plugin dexdump dump
 把内存中的dex文件dump下来，之后有很多dex，先去找mainActivity  
-在kali命令行中找到存放dex文件的目录下，输入命令　grep ril "MainActivity" *
+在kali命令行中找到存放dex文件的目录下，输入命令　grep -ril "MainActivity" *
 如果还有有几个，那就多搜索不同的activity，就用objection中搜索activity，查看后，再次搜索，缩小范围
 
 
